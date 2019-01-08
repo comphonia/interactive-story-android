@@ -1,4 +1,4 @@
-package com.comphonia.interactivestory;
+package com.comphonia.interactivestory.ui;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -7,7 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import com.comphonia.interactivestory.R;
 
 public class MainActivity extends AppCompatActivity {
 
