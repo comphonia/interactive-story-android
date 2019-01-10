@@ -6,6 +6,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,6 +14,8 @@ import android.widget.TextView;
 import com.comphonia.interactivestory.R;
 import com.comphonia.interactivestory.model.Page;
 import com.comphonia.interactivestory.model.Story;
+
+import java.util.Stack;
 
 public class StoryActivity extends AppCompatActivity {
 
@@ -24,6 +27,7 @@ public class StoryActivity extends AppCompatActivity {
     private TextView storyTextView;
     private Button choice1Button;
     private Button choice2Button;
+    private Stack<Integer> pageStack = new Stack<Integer>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,17 +48,65 @@ public class StoryActivity extends AppCompatActivity {
     }
 
     private void loadPage(int pageNumber) {
-        Page page = story.getPage(pageNumber);
+        pageStack.push(pageNumber);
 
-        Drawable image = ContextCompat.getDrawable(this,page.getImageId());
+        final Page page = story.getPage(pageNumber);
+
+        Drawable image = ContextCompat.getDrawable(this, page.getImageId());
         storyImageView.setImageDrawable(image);
 
         String pageText = getString(page.getTextId());
         // add if placeholder is included
-        pageText = String.format(pageText,name);
+        pageText = String.format(pageText, name);
         storyTextView.setText(pageText);
 
+        if (page.isFinalPage()) {
+            choice1Button.setVisibility(View.INVISIBLE);
+            choice2Button.setText(R.string.play_again_btn_text);
+            choice2Button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                  //  finish(); //finish the current activity and takes back to main activity
+                    loadPage(0);
+                }
+            });
+        } else {
+            loadButtons(page);
+        }
+    }
+
+    private void loadButtons(final Page page) {
+        choice1Button.setVisibility(View.VISIBLE);
         choice1Button.setText(page.getChoice1().getTextId());
+
+        choice1Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int nextPage = page.getChoice1().getNextPage();
+                loadPage(nextPage);
+            }
+        });
+
         choice2Button.setText(page.getChoice2().getTextId());
+
+        choice2Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int nextPage = page.getChoice2().getNextPage();
+                loadPage(nextPage);
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        pageStack.pop();
+        if(pageStack.isEmpty()) {
+            super.onBackPressed();
+        }
+        else{
+            loadPage(pageStack.pop());
+        }
+
     }
 }

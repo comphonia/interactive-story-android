@@ -18,6 +18,7 @@ public class Page {
     public Page(int imageId, int textId) {
         this.imageId = imageId;
         this.textId = textId;
+        this.isFinalPage = true;
     }
 
     public Page(int imageId, int textId, Choice choice1, Choice choice2) {
